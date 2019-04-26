@@ -1,0 +1,210 @@
+this contains the documentation for the structure of the Google search. This is for having the format of how to build 
+the SOAPUI test project:
+
+- Project name: Google Map Project.
+- TestSuites:
+	- Directions API testSuite.
+		- Tests:
+			- Simple Test:
+				- TestSteps:
+					- GET - Sample Request - JSON
+					  . EndPoint: http://maps.googleapis.com.
+					  . Method:   GET.
+					  . Resource: /maps/api/directions/json
+					  . Parameters: origin=Toronto&destination=Montreal&sensor=false
+					  . Assertions:
+					  	* Match content of [bounds]. (declare namespace ns1='http://maps.googleapis.com/maps/api/directions/json';
+													  //ns1:Response[1]/ns1:routes[1]/ns1:e[1]/ns1:bounds[1]) --> expt=whole json-node with
+													  below format for the bounds node:
+													  <bounds xmlns="http://maps.googleapis.com/maps/api/directions/json">
+														  <northeast>
+														    <lat>45.54508999999999</lat>
+														    <lng>-73.55211539999999</lng>
+														  </northeast>
+														  <southwest>
+														    <lat>43.6532245</lat>
+														    <lng>-79.3834251</lng>
+														  </southwest>
+														</bounds>
+                        NOTES: We can create above assertion using "Script Assertion" for JSON response, see project 
+                               "07REST Using Groovy Script Assert With JSON Response Project", testStep "JSON RESONSE Request" by 
+                               getting the value of each node: lat, lng for northeast and southeast.														
+					  	* Check number of steps [=13]. (declare namespace ns1='http://maps.googleapis.com/maps/api/directions/json';
+														count( //ns1:Response/ns1:routes/ns1:e/ns1:legs/ns1:e/ns1:steps/ns1:e) --> 
+														expt=13		
+																	
+					- GET - Sample Request - no highways - JSON
+					  . EndPoint: http://maps.googleapis.com.
+					  . Method:   GET.
+					  . Resource: /maps/api/directions/json
+					  . Parameters: origin=Toronto&destination=Montreal&sensor=false&mode=bicycling&avoid=highways					  
+					  . Assertions:
+					  	* Match content of [bounds]. (declare namespace ns1='http://maps.googleapis.com/maps/api/directions/json';
+													  //ns1:Response[1]/ns1:routes[1]/ns1:e[1]/ns1:bounds[1]) --> expt=whole json-node with
+													  below format for the bounds node:
+													  <bounds xmlns="http://maps.googleapis.com/maps/api/directions/json">
+														  <northeast>
+														    <lat>45.54508999999999</lat>
+														    <lng>-73.55211539999999</lng>
+														  </northeast>
+														  <southwest>
+														    <lat>43.6532245</lat>
+														    <lng>-79.3834251</lng>
+														  </southwest>
+														</bounds>
+						NOTES: We can create above assertion using "Script Assertion" for JSON response, see project 
+                               "07REST Using Groovy Script Assert With JSON Response Project", testStep "JSON RESONSE Request" by 
+                               getting the value of each node: lat, lng for northeast and southeast.																
+					  	* Check number of steps [>200]. (declare namespace ns1='http://maps.googleapis.com/maps/api/directions/json';
+														count( //ns1:Response/ns1:routes/ns1:e/ns1:legs/ns1:e/ns1:steps/ns1:e) > 200 --> 
+														expt=true
+					  
+					- GET - Transit with departure time - XML
+					  . EndPoint: http://maps.googleapis.com.
+					  . Method:   GET.
+					  . Resource: /maps/api/directions/xml
+					  . Parameters: origin=Brooklyn&destination=Queens&sensor=false&mode=transi&departure_time=${=(int)new java.util.Date().time/1000}
+					  . Assertions:
+					  	* Match content of [start_location]. (//DirectionsResponse[1]/route[1]/leg[1]/step[1]/start_location[1] --> expt=whole xml-node
+					  	* Match content of [end_location]. (//DirectionsResponse[1]/route[1]/leg[1]/step[1]/end_location[1] --> expt=whole xml-node
+					  	* Check number of steps [>5]  (count( //DirectionsResponse/route/leg/step/step) > 5--> expected=true	
+					  	
+
+- TestSuites:
+	- Distance Matrix API TestSuite.
+		- Tests:
+			- Simple Test:
+				- TestSteps:
+					- GET - Sample Request
+					  . EndPoint: http://maps.googleapis.com.
+					  . Method:   GET.
+					  . Resource: /maps/api/distancematrix/json
+					  . Parameters: origin=Bobcaygeon ON|41.43206,-81.38992&destination=Darling Harbour NSW Australia|24 Sussex Drive Ottawa ON|Capitola CA&sensor=false
+					  . Assertions:
+					  	* Match content of [bounds]. (declare namespace ns1='http://maps.googleapis.com/maps/api/distancematrix/json';
+													  //ns1:Response[1]/ns1:destination_addresses[1]) --> expt=whole json-node with
+													  below format for the bounds node:
+													  <destination_addresses xmlns="http://maps.googleapis.com/maps/api/distancematrix/json">
+ 														 <e>Darling Harbour, Harbourside Shopping Centre, Sydney NSW 2000, Australia</e>
+ 														 <e>24 Sussex Drive, 24 Sussex Drive, Ottawa, ON K1M 1M4, Canada</e>
+  														 <e>Capitola, CA, USA</e>
+													  </destination_addresses>
+                        NOTES: We can create above assertion using "Script Assertion" for JSON response, see project 
+                               "07REST Using Groovy Script Assert With JSON Response Project", testStep "JSON RESONSE Request" by 
+                               getting the value of each node: lat, lng for northeast and southeast.														
+					  	* Match content of [origin_addresses] similar as above.
+					  	* Check number of items [=6]. (declare namespace ns1='http://maps.googleapis.com/maps/api/distancematrix/json';
+														count( //ns1:Response/ns1:rows/ns1:e/ns1:elements/ns1:e)) --> 
+														expt=6		
+
+- TestSuites:
+	- Elevation API TestSuite.
+		- Tests:
+			- Simple Test:
+				- TestSteps:
+					- GET - Sample Request
+					  . EndPoint: http://maps.googleapis.com.
+					  . Method:   GET.
+					  . Resource: /maps/api/elevation/json
+					  . Parameters: locations=39.7391536,-104.9847034&sensor=false   (, separates two columns of one rows for the parameter locations)
+					  . Assertions:
+					  	* Match content of [results]. (declare namespace ns1='http://maps.googleapis.com/maps/api/elevation/json';
+														//ns1:Response[1]/ns1:results[1]) --> expt=whole json-node with
+													  below format for the bounds node:
+													  <results xmlns="http://maps.googleapis.com/maps/api/elevation/json">
+  														<e>
+    														<elevation>1608.637939453125</elevation>
+    															<location>
+      																<lat>39.7391536</lat>
+      																<lng>-104.9847034</lng>
+    															</location>
+    															<resolution>4.771975994110107</resolution>
+												  		</e>
+											          </results>
+                        NOTES: We can create above assertion using "Script Assertion" for JSON response, see project 
+                               "07REST Using Groovy Script Assert With JSON Response Project", testStep "JSON RESONSE Request" by 
+                               getting the value of each node: lat, lng for northeast and southeast.														
+
+					- GET - Sample Request - Multiple Responses
+					  . EndPoint: http://maps.googleapis.com.
+					  . Method:   GET.
+					  . Resource: /maps/api/elevation/json
+					  . Parameters: locations=39.7391536,-104.9847034|36.455556,-116.866667&sensor=false   
+					               (, separates two columns of one rows for the parameter locations AND
+					  				| separates two rows of one rows for the parameter locations																)
+					  . Assertions:
+					  	* Match content of [results]. same as above.
+
+					- GET - Path Elevation Sample
+					  . EndPoint: http://maps.googleapis.com.
+					  . Method:   GET.
+					  . Resource: /maps/api/elevation/json
+					  . Parameters: path=36.578581,-118.291994|36.23998,-116.83171&sensor=false&samples=3   
+					               (, separates two columns of one rows for the parameter locations AND
+					  				| separates two rows of one rows for the parameter locations																)
+					  . Assertions:
+					  	* Match content of [results]. same as above.
+
+- TestSuites:
+	- Geocoding API TestSuite.
+		- Tests:
+			- Simple Test:
+				- TestSteps:
+					- GET - Sample Request
+					  . EndPoint: http://maps.googleapis.com.
+					  . Method:   GET.
+					  . Resource: /maps/api/geocode/xml
+					  . Parameters: address=1600 Amphitheatre Parkway, Mountain View, CA&sensor=false   (, separates two columns of one rows for the parameter locations)
+					  . Assertions:
+					  	* Match content of [geometry]. (declare namespace ns1='http://maps.googleapis.com/maps/api/geocode/json';
+											//ns1:Response[1]/ns1:results[1]/ns1:e[1]/ns1:geometry[1]) --> expt=whole json-node with
+													  below format for the bounds node:
+													  <geometry xmlns="http://maps.googleapis.com/maps/api/geocode/json">
+														  <location>
+														    <lat>37.4228576</lat>
+														    <lng>-122.0850647</lng>
+														  </location>
+														  <location_type>ROOFTOP</location_type>
+														  <viewport>
+														    <northeast>
+														      <lat>37.4242065802915</lat>
+														      <lng>-122.0837157197085</lng>
+														    </northeast>
+														    <southwest>
+														      <lat>37.4215086197085</lat>
+														      <lng>-122.0864136802915</lng>
+														    </southwest>
+														  </viewport>
+														</geometry>
+                        NOTES: We can create above assertion using "Script Assertion" for XML response, see project 
+                               "08REST Using Groovy Script Assert With XML Response Project", testStep "XML RESONSE Request" by 
+                               getting the value of each node: lat, lng for northeast and southeast.														
+
+					- GET - Reverse Lookup Sample
+					  . EndPoint: http://maps.googleapis.com.
+					  . Method:   GET.
+					  . Resource: /maps/api/geocode/xml
+					  . Parameters: sensor=false&latlng=40.714224,-73.961452   (, separates two columns of one rows for the parameter locations)
+					  . Assertions:
+					  	* Match content of [geometry]. (declare namespace ns1='http://maps.googleapis.com/maps/api/geocode/json';
+											//ns1:Response[1]/ns1:results[1]/ns1:e[1]/ns1:geometry[1]) --> expt=whole json-node with
+													  below format for the bounds node:
+													  <geometry xmlns="http://maps.googleapis.com/maps/api/geocode/json">
+                                                         ....
+          											</geometry>
+                        NOTES: We can create above assertion using "Script Assertion" for XML response, see project 
+                               "08REST Using Groovy Script Assert With XML Response Project", testStep "XML RESONSE Request" by 
+                               getting the value of each node: lat, lng for northeast and southeast.														
+
+
+
+
+
+
+
+
+
+
+
+
+					  	

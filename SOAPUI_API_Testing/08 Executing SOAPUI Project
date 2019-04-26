@@ -1,0 +1,53 @@
+SOAPUI PROJECT EXECUTION.
+SOAPUI projects can be executed from:
+1- SOAPUI Environment.\
+2- Command prompt
+3- Any IDE environment like Eclipse.
+
+1- From SOAPUI environment:
+   In Basic tab:
+	1.1- right click the project and click on "Lunch testRunner"
+	1.2- In the TestSuite listbox: select All or the specific TestSuite we want to run
+	1.3- In the TestCase listbox: select All or the specific TestCase we want to run
+	1.4- In testRunner Path provide: C:\Program Files\SmartBear\SoapUI-5.4.0\bin
+	1.5- Check saves project before running.
+	1.6- if needed indicate protected password
+   In Report tab:
+    1.7- Check the four checkboxes
+    1.8- Indicate the root folder: C:\SOAP_UI\Reports
+    
+    1.9- click on Launch button
+    1.10- A popup windows is displaye with the result.
+   
+ 2- from the command prompt:
+  	2.1- Copy the third line in the popup (1.10), when running the project from SOAPUI environment, this line is:
+  	  testrunner.bat -sAutomaationGrovvyTestSuite -cGroovyScriptTestCase -r -a -j -J -f C:\SOAP_UI\Reports C:\SOAP_UI\04AutomationWithGroovySOAPProject-soapui-project.xml
+  	2.2- change to the testRunner path directory: cd C:\Program Files\SmartBear\SoapUI-5.4.0\bin
+  	2.3- Execute the copied command:
+  	     testrunner.bat -sAutomaationGrovvyTestSuite -cGroovyScriptTestCase -r -a -j -J -f C:\SOAP_UI\Reports C:\SOAP_UI\04AutomationWithGroovySOAPProject-soapui-project.xml
+  	                    here -s is the TestSuite. (xxx or all) 
+  	                         -c is the test case. (xxx or all)
+  	                         -r indicate generate Report
+  	                         -j indicate generate report in JUnit format.
+  	                         -f indicate the path of the report.
+  	                            last is the path and name of the project: C:\SOAP_UI\04AutomationWithGroovySOAPProject-soapui-project.xml
+     Maybe we can use this same instruction 2.1....2.3 to execute this SOAPUI project in Jenkins, without having
+     SOAPUI running.
+  	   
+3- Any IDE environment like Eclipse.
+ 	3.1- Create the Eclipse project.
+ 	3.2- Using the JUnit plugin in Eclipse, so right click on the src folder
+ 	3.3- Create a JUnit TestCase, by right click on the src folder, then new --> others then
+ 	     open the JUnit folder and select JUnit TestCase.
+    3.4- Proision the name and click Finish. Add the automatic JUnit Jar file
+    3.5- Import the SOAPUI Jar file so that we can run SOAPUI project, for this:
+    	 right click on the Eclipse project, click on properties, click on Add build Path then
+    	 click on "Add External Jar..." button
+    	 Go to the SAOPUI jar file directory: C:\Program Files\SmartBear\SoapUI-5.4.0\bin
+    	 Select this jar file:  soapui-5.4.0
+    3.6- Go to the SOAPUI lib directory: C:\Program Files\SmartBear\SoapUI-5.4.0\lib and Add all the .jar in here 	     
+ 	3.7- Insert the command SoapUITestCaseRunner testRunner = new SoapUITestCaseRunner(); and then 
+ 	     select import SoapUITestCaseRunner to fix the error. See class SOAP_JUnit.java in 
+ 	     SOAPUI_PROJECT_RunFromEclipse project.
+ 	
+ 	  	    

@@ -1,0 +1,358 @@
+
+Google Places API access key: AIzaSyAPZEOnGpNTrh-Oqh-kBxLzKL3y_jXiwyw
+Place Search: REST URL https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=Museum%20of%20Contemporary%20Art%20Australia&inputtype=textquery&fields=formatted_address,name,place_id&key=AIzaSyAPZEOnGpNTrh-Oqh-kBxLzKL3y_jXiwyw
+https://maps.googleapis.com/maps/api/place/textsearch/json?query=restaurants+in+Sydney&key=AIzaSyAPZEOnGpNTrh-Oqh-kBxLzKL3y_jXiwyw
+https://maps.googleapis.com/maps/api/place/textsearch/xml?query=restaurants+in+Sydney&key=AIzaSyAPZEOnGpNTrh-Oqh-kBxLzKL3y_jXiwyw
+
+My flickr account online loging key: 11157    my username ssshhernandez@gmail.com
+Done! Here's the API key and secret for your new app:
+	Application Name: FlickrAPISOAPUILearning
+Key: e8c69d14e52dd658f81493b6d20c4f0f
+Secret: 683170dacda76bf4
+
+Edit app details - Edit auth flow for this app - View all Apps by You
+      > object{2}        -- defines two object: photos (which is an object containig 5 objects) and status (with value = ok)
+      	> photos {5}
+      	  status: ok
+Xpath Traversing considerations:
+	When traversing xpath using XML, we traverse through tags/nodes, using forward slash '/' notation.
+	When traversing xpath using JSON, we traverse through objects, using a dot '.' notation.
+	
+Advanced JSON Assertions:  "This must be used with "JsonPath Match" in assertions "Properties content".
+                    *** THIS MUST BE USED WHEN THE INDEX IS NOT STATIC, WHICH MEANS WHEH THE CONTENT 
+                       OF THE INDEX CAN CHANGE WITH TIME, example today photo[3] has the owner = 'Hector'
+                       but tomorrow photo[3] can have a different owner, example owner = 'John'
+                       
+Example grab the value of id object where the title object has the value "Selfie in Tenerife" to do this we have
+to use this format: photos.photo[?(@.object=='value')].object  example:
+                    photos.photo[?(@.title=='Selfie in Tenerife')].id    //this will check all the 99 indexes
+                               of the photo object and will point to the id object having the object title 
+                               with the value equal to 'Selfie in Tenerife'. In the expected value panel, the
+                               value to compare must be enclosed in [], like [43020368682]
+Grab the object server value where id = '43020368682'                     
+                    photos.photo[?(@.id=='43020368682')].server  	  
+Grab the object title value where id = '43020368682'
+					photos.photo{?(@.id=='43020368682').title                    
+Grab the object id value where title = 'Another World'
+					photos.photo{?(@.title=='Another World').id                    
+we can create assertion on ALL the objects in an specific index at once by using the wildcard '*',
+     example: photos.photo[5].*    // this will validate ALL the objects in the index 5. the 
+   // expected value must be [29201264868, 91093355@N05, b6f38cb419, 1770, 2, London Heal's II, 1, 0, 0]
+   // and can be obtained by click Test button and the copy and paste it in the expected result panel.
+
+using "JsonPath Existence Match" in assertions "Properties content", to validate if an specific object exist
+in the JSON response: object OR parentObject.Childobject
+       example photos 
+			   photos.page
+			   photos.photo[1].owner //all of these will return: true or false according to the existence or
+			                          not of the path of these objects in the JSON response. 
+Notes: when reviewing a JSON response using any JSON online editor the following guidelines are useful:
+       {x}: is for Objects indicator, means that there are x objects. example photos{5} means that there
+            are 5 photos objects
+       [n]: is for Array indicator, means that there are n elements in the array. example photo[100] means that there
+            are 100 elements in the photo array.
+        
+
+1- google "soapui download"
+2- select the latest release url: https://www.soapui.org/downloads/latest-release.html
+3- Select the windows version and download it in the new folder c:\SOAP_UI.
+4- Click on the SOAPUI...exe file and click next until installation is completed.
+
+CREATING A NEW SOAPUI PROJECT.
+1- Click on File --> Create a New SOAP project
+2- provision the name
+3- In the initial WSDL field, provide the URL for the WSDL of the WebService that we are going
+   to be using for testing. This WSDL will be used by SOAPUI software to automatically build ALL
+   the requests for all the Operations/Methods defined in the WSDL.
+   Example of the url: http://www.dneonline.com/calculator.asmx?WSDL
+   or file:///C:/SOAP_UI/myWSDL   (If the file was in my localhost/desktop.
+4- accept all default settings and click Ok button.
+5- the projects panel shows two versions of the SOAP Webservice: CalculatorSOAP and 
+   CalculatorSOAP12, we will use this latest one.
+ 
+ SUBMITTING A REQUEST:
+ 1- Open one of the Webservice Operations created by SOAPUI, Example: ADD operation.
+ 2- click on the request: "Request 1" 
+ 3- Verify that a new panel is created for the request 1 containing:
+ 	3.1 The SOAP Webservice End Point: http://www.dneonline.com/calculator.asmx
+ 	3.2 The first sub-panel contains the xml code for the request with the parameters needed
+ 	    to be provisioned represented by '?' (question mark) and its data type.
+ 	3.3 Provision the parameters.
+ 	3.4 execute/send the request by clicking the green arrow head on the tools menu where the
+ 	    End Point is displayed.
+ 	3.5 The response is displayed, with the corresponding xml in the second subpanel.
+ 4- this complete the first manual testing of the Webservice.
+ 
+ CREAATING TEST SUITE AND TEST CASES.
+ 1- right click on the project
+ 2- select the "new Test Suite" option
+ 3- provide the test suite name and click Ok button. "Calculator_TestSuite".
+    A new "Calculator_TestSuite" folder is created.
+ 4- To CREATE A TEST, right click on the test suite folder
+ 5- click on the "new testcase" option.
+ 6- provision a testcase name: "Adding Function Test" 
+ 7- TO ADD THE TEST STEPS FROM THE "SOAP REQUEST" WE WANT TO TEST:
+ 	7.1 Right click on the testcase name: "Adding Function Test".
+ 	7.2 click on "Add step" then click on "SOAP Request"
+ 	7.3 In the "specify name for new step" field append the SOAP request name we want to test,
+ 	    (for example: Add, Substract, multiple) to the default content "SOAP Request" so the 
+ 	    new step name will be: "SOAP Request Add". and click Ok button.
+ 	7.4 Open the "select operation to invoke for request" listbox and select the SOAP Request 
+ 	    according to the version we want to send the request. In this case: 
+ 	    "CalculatorSoap12--> Add and click Ok button.
+    7.5 Check the "create optional elements" and click Ok button.
+    7.6 Verify that the first sub-panel contains the xml code for the request with the parameters needed
+ 	    to be provisioned represented by '?' (question mark) and its data type. 
+ 	7.7 verify that the second sub-panel is empty, waiting for the response.
+ 	
+ Note: to download Rahul webservice application to be used in this course, for the mySQL we 
+       have to use the user/password: root/root.
+ 
+ 									VERY Important Notes:
+Section 2, Lecture 9
+In the next lecture, I will go through instructions to setup local service in your machine 
+which we will be using in next few lectures for practice.
+
+If you have any troubles in Setting up the service which involves multiple software's. You can 
+simply use below Service URL which is hosted on cloud to save your time and skip next lecture 
+completly :)
+
+http://216.10.242.178:8082/axis2/services/EmployeeManagementService?wsdl  -- *** USE THIS  *** 
+
+Above WSDL is same as the one which you will seeing in the next lecture to setup in your local.
+You can import above URL instead of below when ever I refer to the WSDL link in the lectures
+http://localhost:8082/axis2/services/EmployeeManagementService?wsdl  -
+********************************************************************************************
+
+For the Students  who want to use local service by setting up in your machines instead of 
+depending on Internet connection
+THEN Please remember below points while watching next lecture-  Local Service setup will NOT 
+WORK if you dont follow below instructions
+
+In the next lecture when asked to Download mysql- Please download 5.7.22 only.
+Link to installer for MySQL version 5.7.22 - https://downloads.mysql.com/archives/installe?r/
+
+2. Before downloading mysql make sure you dont have any sql instances in your machine.. 
+if there are, please uninstall all of them and download MYSQL.. 
+
+3. while installing MYSQL When Prompted, Please use mysql username and password as root and 
+   root respectively... Port number should be 3306
+
+4, Make sure your java version is 1.8 and set JAVA_HOME is set in system variables..	 
+
+THINGS TO VALIDATE FOR EACH REQUEST USING Basic ASSERTIONS
+A- For Add employee testcase:
+1- Verify the response is returning True				 this is: "contains' in assertions: "Property content"
+2- Verify the response NOT having null or false values.  this is: "Not contains", in assertions: "Property content"
+3- Verify the response is a valid Soap response in       this is: "SOAP Response", in assertions: "Compliance, Status and Standard"  
+   relation to envelope with header, body, fault.
+4- verify the response has a valid HTTP status code.	 this is: "Valid HTTP Status Codes", in assertions: "Compliance, Status and Standard"
+5- Verify the response time is within boundaries.		 this is: "Response SLA", in assertions: "SLA"
+6- Verify security Threat.                               this is: "Sensitive Information Exposure", in assertions: "Security"
+  ** This is created to make sure that certain sensitive information
+     are not present in the response, like specific value for a token. We
+     can define multiple token/or expression for security. the security is to make sure that 
+     we are not leaking any sensitive information with this response. Like some id generated or token that are unique
+     to the logged user, so these should not be exposed, this is why in our assertions we have to indicate the not
+     presence of these values/expression/literals. 
+ 	       
+ 	       
+THINGS TO VALIDATE FOR EACH REQUEST USING Advanced ASSERTIONS 	       
+1- to create "Xpath Assertion": 
+	0.1 Create an Xpath, Starting with // and the first parent node after the body node, and continue
+	    with all the parent nodes until the child node we want validate, example for Age node:
+			//ns:getEmployeeDetailsResponse/ns:return/ns:age
+	or 0.2 Create the Xpath, starting with // and the node of the child we want to validate:
+	        //ns:age			     
+	1.1 In Assertions panel click on "property content"
+	1.2 Select "Xpath Match" and click the Add button. 
+	1.3 Provision the unique name for Assertion: "Deparment Assetion Xpath" and click ok button.
+	1.4 In the Xpath Expression panel click on the "Declare" button, ** this is mandatory **
+	1.5 Three lines are inserted automatically.
+	1.6 Append a line with the xpath created in action 0.1 or 0.2:
+			//ns:getEmployeeDetailsResponse/ns:return/ns:age
+			//ns:age
+    1.7 In the expected result panel, provision the expected "value"
+    1.8 click on the "Test" button to verify if was created without any error/typo.
+    1.9 click on the Save button.
+    			
+	     
+B- For GET employee details testcase:      
+1- Verify the ID of the employee is 123.   this is: Using Xpath.
+2- Verify the department is CS             this is: Using Xpath.
+3- Check SOAPUI response pattern.
+4- verify Age attribute is displayed. (only to validate that the age tag is present in the
+                            response or Not, to get this we need to use the exists(xpath) method when
+                            defining the Xpath for the age node, example: exists(//ns:age) the expected
+                            value for the assertion can be true or false
+                            Created the "Age Exists Assertion" with Xpath in "Property Content") 
+                            
+5- Verify only unique name returns. (to make sure that only one response is received, this is not
+                        multiple employee Details received, so we can test this by making sure that the 
+                        response contains ONLY ONE of one specific tag/node: example only on ns:age, or 
+                        only on ns:department, we can accomplish this by using: count(//ns:age) or
+                        count(//ns:department) this will count the amount of this node present in the response
+                        and we can use the expected value of "1" if it is different then assertion will fail
+                        Created the "Only One Name Node Assertion" with Xpath in "Property Content")
+  
+  **** VERY IMPORTANT VALIDATION:
+  assuming we need to create an Assertion for an ADD/INSERT/CREATE functionality, where all the fields remains
+  the same; but the id node. this id node is the key field and is incremented automatically so every time 
+  we send the ADD request it will have a new value. the we solve this is by indicating a wildcard ('*') for 
+  the value of the id node. this is the process:
+  1- Define Xpath Match Assertion with name "Response Whole Content Assertion" for the whole return: //ns:return
+  2- In the Expected result panel, click on the "Select from current" button to automatically insert all the 
+     child nodes included in the parent ns:return node:
+     <ns:return xsi:type="ns:Employee" xmlns:ax21="http://exception.reservation.sample.com/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns="http://sample.com/reservation/guest/types" xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
+  			<ns:age>26</ns:age>
+  			<ns:department>IT</ns:department>
+  			<ns:id>*</ns:id>
+  			<ns:name>Moon</ns:name>
+	 </ns:return>                      
+  3- In the id node, or the changing value node, replace the current value for the wildcard '*' and click on
+     the "Allow Wildcards" checkbox close to the Test button in the options menu.     
+  4- click Test button, to verify for not error.
+  5- Click on the Save button.                  
+6- Verify security Threat.   
+ 	       
+ 	MANAGING PROPERTIES IN SOAPUI.
+In SOAPUI properties are use to make the test data driven, so properties are varialbles (like, global, local)
+or dataProviders. Properties can be defined for access the at multiple levels:
+	1- TestCase level properties.
+		After selecting the specific testCase, this properties are defined for and in the testcase using the 
+		"custom properties" tab of the test case. 
+		They can only be accessed inside the test case where they are defined.
+		1.1 click on the "custom properties" tab.
+		1.2 click on the '+' Add button.
+		1.3 provison the name and value for the testCase level property/variable.
+		
+	2- TestSuite level properties.
+		After selecting the specific testSuite, this properties are defined for and in the testSuite using the 
+		"custom properties" tab of the testSuite. 
+		They can only be accessed inside the testSuite, where they are defined, by ALL the testcases included
+		in the TestSuite.
+		2.1 click on the "custom properties" tab.
+		2.2 click on the '+' Add button.
+		2.3 provision the name and value for the testSuite level property/variable.
+		
+	3- Project level properties.  
+	4- Properties TestStep.
+	After selecting the specific testStep, this properties are defined for and in the testStep.  
+	They can only be accessed inside the testStep, where they are defined,
+		4.0 NOT using the "custom properties" tab, BECAUSE the testStep DOES NOT HAVE IT. Instead we have 
+	    to use below method. 
+	    For a REQUEST we can define multiple TestStep level properties (a set), for this
+		4.1 right click the REQUEST ("AddEmployee Request") below the "Test Steps (x)"
+		4.2 Select "Insert steps" option and then click on "Properties"
+		4.3 provision the name of the properties SET, like "AddEmployeePropertiesSet".
+		4.4 A popup window will show up and click the '+' Add button to add all the properties we need,
+		    this is name and value pairs.
+		4.5 close the popup window. 
+			
+	5- Properties Upload from external files.
+	   5.1 In my local computer, folder c:\SOAP_UI, Create a notePad file with extension .properties
+	   5.2 provision the key - value pairs for all the properties we want to use. 
+	   		ExtFileEmployeeId=2121
+			ExtFileDept=Printing Facility
+			ExtFileAge=33
+	   5.3 Save the file with extension *.properties (Employee.properties).
+	   5.4 Using the "Custom Properties" tab, for the level we want (Project, TestSuite or TestCase) 
+	       click on the "Loads properties values from an External file" button. 
+	   5.5 Browse the location of the file and check on the "Create missing properties" 
+	   5.6 click ok in the confirmation msg.    
+	   5.7 to use these properties follow below section "USING THE DEFINED PROPERTY:"
+	        
+	    
+	6- Properties Transfer between TestSteps.
+	   For this we are going to assume that we are running End-to-End scenario where all the Request-calling
+	   steps are in the same TestCase and we want to pass a value of a node in the result (or the value in a 
+	   response) (input request is GetEmployeeDetail-Request) as a value in another node in the request 
+	   (output request is DeleteEmployee-Request) the next step.
+	   6.0 copy all the steps into one testCase by cloning the existing steps from different testCase, or create
+	       the steps from scratch.
+	   6.1 At the testSuite level, using the "custom properties" tab, create a property for each one of the
+	       properties/node to be transfered, example NamePropertyTransfer, IdPropertyTransfer... and let them
+	       empty, no value.    
+       6.2 right click the Request-calling step that is providing the response from where we want to transfer
+           the specific node value.	 
+       6.3 Select the "Insert Step" options and click on the "Property Transfer" option.
+       6.4 provision the name for the step, like: "GetEmpDetail- Property Transfer"
+       6.5 click on the '+' Add transfer button (here we can define multiple node and values to be transfer"
+       6.6 provision the Transfer name: "Name Transfer"       
+       6.7 IN THE SOURCE PANEL: select the request generating the response to be used as a source for the node: in this case was
+           the GetEmployeeDetail-Request.
+           -In the property listbox select "Response", to grab the whole xml for the response, this contains
+               all the nodes I can use for transfering. This response property is included in the
+               "customer properties" tab at TestSteps level, for this testStepRequest.
+           - In path language select "Xpath", we will use Xpath to identify the nodes.
+       6.8 to start defining the xpath to access the node, we have to declare the spacename, so, 
+           click on the "Declare Namespace" button in the tools bar. to insert the template to be used as a
+           reference for creating the spacename for the node type (ns:) used to define the node (ns:name) that we want to 
+           transfer its value.
+       6.9 Go to the response panel for this input request and grab the URL where the node type is defined 
+           example for the ns: tag type, this URL is located in the first parent node after the body node, 
+           this is ns="http://sample.com/reservation/guest/types".
+       6.10 Create the namespace by modifying one of the existing one:
+            declare namespace ns1='http://exception.reservation.sample.com/xsd';
+            to 
+            declare namespace ns='http://sample.com/reservation/guest/types'; 
+            changing the double quote " by single quote ' in the URL.
+       6.11 DELETE all the others declaration.
+       6.12 Insert the Xpath for the node/field we want to transfer.
+       		//ns:getEmployeeDetailsResponse/ns:return/ns:name/text()
+       		text() method grab the content of the node.
+       
+       6.13 IN THE TARGET PANEL: select the request receiving the response from the source, in this case was
+           the DeleteEmployeeRequest.
+           -In the property listbox select "Request", to grab the whole xml for the request, this contains
+               all the nodes I can use for receiving a transfer. This request property is included in the
+               "customer properties" tab at TestSteps level, for this testStepRequest.
+           - In path language select "Xpath", we will use Xpath to identify the nodes.
+       6.8 to start defining the xpath for the receiving node, the template to be used as a
+           reference for creating the spacename for the node type (typ:) used to define the node (typ:name) that 
+           we want to receive the transfer value.
+       6.9 Go to the request panel for this output request and grab the URL where the node type is defined 
+           example for the typ: node/tag type, this URL is located in the first line of code (soap:evelope tag), 
+           this is typ="http://sample.com/reservation/guest/types".
+       6.10 Create the namespace by modifying one of the existing one:
+            declare namespace ns1='http://exception.reservation.sample.com/xsd';
+            to 
+            declare namespace typ='http://sample.com/reservation/guest/types'; 
+            changing the double quote " by single quote ' in the URL.
+       6.11 DELETE all the others declaration.
+       6.12 Insert the Xpath for the node/field we want to receive transfer.
+       		//typ:deleteEmployee/typ:employeeName
+            This xpath receive the value transfered.
+   Note: repeating above steps for transfering the name from AddEmployeeRequest to GetEmployeeDetailRequest
+         will insert this for the Name node in GetEmployeeDetailRequest:
+          <typ:employeeName>${#TestSuite#EmployeeName}</typ:employeeName>
+          here: ${#TestSuite#EmployeeName} is the same TestSuite level property that we defined as and input
+          for the AddEmployeeRequest. This is the value transfer, and because it is a property defined at 
+          TestSuite level the content is available in the GetEmployeeDetailRequest.
+          Another way to accomplish this is, in the GetEmployeeDetailRequest, insert the property making 
+          reference to the Xpath of the node in the Request property of the AddEmployeeRequest like this:
+          <typ:employeeName>${addEmployee Request#Request#//typ:addEmployee/typ:name/text()}</typ:employeeName> 
+            
+            
+            
+            
+         
+	7- Accessing Custom properties.	       
+
+			USING THE DEFINED PROPERTY:
+	1- Open the request xml 
+	2- Go to the node where we want to use the property/variable.
+	3- Delete the '?' character and click on the rightClick button.
+	4- Select the option "Get Data..." and select the level of the property we want to use for this node.
+		4.1 - Project Level...
+		4.2 - TestSuite Level...
+		4.3 - TestCase Level...
+		4.4 - Step x Level...
+	5- Click on the property we want to use.
+	6- Verify that the '?' was replaced by a general expression like this ${#level#propertyName} example:
+	    where level = {#Project|#TestSuite|#TestCase|TestStep}. note the '#' indicate that this is keyword
+	                  name used by SOAPUI and must be typed like that, the TestStep one is not a keyword so
+	                  it can be changed.
+	          propertyName = the name of the property defined and tha we want to use.
+	               ${#Project#UserId}, ${#TestSuite#EmployeeName}, ${#TestCase#Age}, 
+	               ${AddEmployeePropertiesSet#department} this does NOT use '#'   

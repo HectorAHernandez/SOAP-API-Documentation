@@ -1,0 +1,104 @@
+  
+  Google Places API access key: AIzaSyAPZEOnGpNTrh-Oqh-kBxLzKL3y_jXiwyw
+   Place Search: REST URL https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=Museum%20of%20Contemporary%20Art%20Australia&inputtype=textquery&fields=formatted_address,name,place_id,scope&key=AIzaSyAPZEOnGpNTrh-Oqh-kBxLzKL3y_jXiwyw
+   
+  
+  GROOVY INSTALLATION AND TIPS.
+  For automation, when adding the "SOAP Request" to the "Test Steps (1)" in the TestCase (AddEmployeeTestCase) then
+  we have to take out all the '?' in all nodes in the Request xml. because it is not manual and we will be passing
+  the values using the Groovy code.
+  the SOAPUI hierarchy is: Project --> TestSuite(s) --> TestCase(s) --> TestStep(s).
+  
+  For automation we can:
+  	A- Create a new TestCase and add TestSteps as Groovy code.
+  	B- In one existing TestCase: add TestSteps as Groovy code.
+  	
+  In SOAPUI Using Groovy script, the Scripts are invoked with:
+  	a- Log variables.
+  	b- Context variables.
+  	c- TestRunner variables.
+  	These variables, allow easy creation of the automation process.
+  	
+  	IMPORTANCE OF logs, Context and TestRunner variables:
+  	For this section and for the "GroovyScriptTestCase" TestCase, I have created a TestCase level property
+  	called "name". (#TestCase#name) 
+  	Logs variables are used to print any text, literal or variable value into the Console. basically to 
+  	               create the log of what is happening: ex. log.info "This is my first Groovy program"
+
+	Context variables: are used to access and manipulate/modify the variables and properties ONLY DEFINED in 
+	     my Groovy TestCase, this is the context variables has the scope of the Groovy testCase defining it.
+	     The scope of a context variable is limited to the Groovy Script TestCase that is defining it.
+	     In Groovy in order to access these context properties/variables we have to use the command 
+	     context.expand('${#TestCase#propertyName}') format, for example:  	               
+  	 					context.expand('${#TestCase#name}')
+  	 					context.expand('${#TestSuite#Age}')  ** this is not valid because it is out of scope of the testCase
+  	 					                                       because it is defined at TestSuite level. 
+  	 					context.expand('${#TestCase#Department}')
+		to print, in the console, the content of a name property, defined in this testCase, we can use this:
+		log.info "TestCase name property content is: " + context.expand('${#TestCase#name}') 
+		We cannot use:  log.info "TestCase name property content is: " + ${#TestCase#name}
+		because we are in a groovy testStep and cannot directly use the ${#TestCase#name} notation without
+		prefixing it with context.expand('').
+		
+ 	testRunner variables: 
+ 	    We use testRunner If, in the Groovy testStep, we want to use a property defined in a TestCase outside of our Groovy TestStep-testCase, 
+		for example I want to access the id property in the TestCase "GetEmployeeDeatilTestCase", it wont be 
+		possible using a context.expand variable, we have to use a testRunner variable, which have an scope 
+		at the whole project level, therefore, including all TestCases.
+		there is a rule that says "To access any property in any other sibling element (testCase) you have to
+		             come through it's parentS first and only". 
+        If there is a property named "id" in another Testcase called "GetEmployeeDeatilTestCase", below is how
+        to build the path to get to this external property/variable:
+        1- testRunner.testCase     //to go back to the testCase level because we were at the testStep level in the "FirstGroovyScript" step. 		             
+		2- testRunner.testCase.testSuite   // to move to the TestSuite level
+		3- testRunner.testCase.testSuite.testCases  // to get to the level of ALL the testCases in the testSuite.
+		4- testRunner.testCase.testSuite.testCases["GetEmployeeDeatilTestCase"] //to indicate the specific testCase we want to access.
+		5- testRunner.testCase.testSuite.testCases["GetEmployeeDeatilTestCase"].getPropertyValue("id") //using this 
+		                             //method to the the value of the property "id"
+
+    testRunner METHODS FOR GET AND SET PROPERTIES:
+    To get the value in the "department" property defined in the same Groovy testCase we can use:
+     	testRunner.testCase.getPropertyValue("department")		                             
+		
+    to get the content of the "Request" property used in the "GetEmployeeDetailSOAPRequest" testStep of the
+    "GetEmployeeDeatilTestCase" testCase in the "AutomaationGrovvyTestSuite" testSuite FROM the Groovy testCase.
+    testRunner.testCase.testSuite.testCases["GetEmployeeDeatilTestCase"].testSteps["GetEmployeeDetailSOAPRequest"].getPropertyValue("Request") 		
+		
+	SETTING THE PROPERTIES VALUES, USING testRunner variable:
+	
+	//to set the value in "age" property defined in another testCase "AddEmployeeTestCase" from this Grrovy TestCase. using testRunner variable
+     testRunner.testCase.testSuite.testCases["AddEmployeeTestCase"].setPropertyValue("age","999")
+   
+   // now print the value we can use get:  
+log.info " *** value of property age in testCase AddEmployeeTestCase is: " +  testRunner.testCase.testSuite.testCases["AddEmployeeTestCase"].getPropertyValue("age")
+
+//to SET the value in "department" property defined in this GrrovytestCase "GroovyScriptTestCase" . using testRunner variable
+    testRunner.testCase.setPropertyValue("department","NEW DEPARTMENT")
+
+// NOW TO PRINT THE SET VALUE:    
+log.info " *** value of property departemen in this same Grrovy testCase is: " +     testRunner.testCase.getPropertyValue("department")
+
+//ACCESSING A PROPERTY DEFINED AT PROJECT LEVEL. Example the gender property:
+      testRunner.testCase.testSuite.project.getPropertyValue("gender")
+//ACCESSING A PROPERTY DEFINED AT PROJECT LEVEL. Example the gender property:
+      log.info " *** Getting value of Project level property: " + testRunner.testCase.testSuite.project.getPropertyValue("gender")	
+// Setting/modifying value of a project level property.
+      testRunner.testCase.testSuite.project.setPropertyValue("gender","MALE")
+      log.info " *** Getting value of Project level property: " + testRunner.testCase.testSuite.project.getPropertyValue("gender")	
+// ALSO we can define a variable to keep the path up until the project level and then using this variable to get or set the property, example:
+      def projectLevel = testRunner.testCase.testSuite.project
+      log.info " *** Getting value of Project level property: " +  projectLevel.getPropertyValue("gender")      
+// now modifying it
+      projectLevel.setPropertyValue("gender","FEMALE")
+      log.info " *** Getting value of Project level property: " +  projectLevel.getPropertyValue("gender")    
+// We can do the same for accessing properties at tstSuite level.
+      def testSuiteLevel = testRunner.testCase.testSuite
+      testSuiteLevel.getPropertyValue("TSuiteAddress")  
+// if I want to access a userId property in another testSuite than my same project then do this:
+  def anotherTestSuite = testRunner.testCase.testSuite.project.testSuite["anotherTestSuiteName"]
+// then do this:
+    anotherTestSuite.getPropertyValue("userId")
+            
+	
+		
+			 					

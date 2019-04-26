@@ -1,0 +1,72 @@
+TIPS for database testing using SOAPUI.
+
+- I have downloaded and installed XAMPP software which contains mySQL and others software.
+- To start mySQL software we open the XAMPP Control Panel program and there click on start for
+  mySQL, keep in mind the port number were mySQL start running. frequently it is 3306.
+- Updated the path environment variable with the directory where the mysql executable is located,
+  this is mySQLPath C:\Program Files\MySQL\MySQL Server 8.0\bin
+  
+ - Start the MySQL service by: 
+      1- right click on the bottom line and click on the Task Manager Option
+      2- click on the Services tab.
+      3- Select the service MySQL80 and right click on top the stopped status and click on start.
+ This error is generated when MySQL80 service is not starte:
+     ERROR 2003 (HY000): Can't connect to MySQL server on 'localhost' (10061)
+          
+- Start Program: Open the MySQL meny and click on "MySQL Workbench 6.3 CE"      
+- On the INSTANCE section, click on Start/Shutdown to start the database Server.
+- login to mysql with the root user with this command: mysql -u root -p    
+  note: -u root is the user name, -p is for the password.
+  these are the userId an password we have defined: 
+   root/root or sai..b0 and hector/sai....b0 
+- after clicking Enter, will be asking for password, click Enter because there is no password defined
+  for the user root. this is only for practice.
+- Created the testdb database with this command: CREATE DATABASE testdb;
+- To start using the database issue this command: use testdb;
+- Created a table in the database with this command:
+     create table training (name varchar(20), course varchar(20), location varchar(20), skill varchar(20));
+- inserted some rows to the table with command:
+     insert into training values('Venky','Loadrunner','UK','Performance');
+     insert into training values('Venktesh','SoapUI','US','Services');
+     insert into training values('Trainer','Selenium','India','functional'); 
+     insert into training values('Automation','Qtp','Canada','HPtool');         
+
+					ACCESSING DATABASE DATA USING SOAPUI.
+- After creating the project, testSuite and TestCase, 
+- Add a testStep for "JDBC Request"
+- Before doing anything, we have to download the "mysql jdbc driver" jar file. from
+  https://dev.mysql.com/downloads/file/?id=477058, without login in. Save it in your c:\\SOAPUI folder
+- unzip the downloaded zip file.    
+- Copy the "mysql-connector-java-8.0.11.jar" file in this SOAPUI directory: "C:\Program Files\SmartBear\SoapUI-5.4.0\bin\ext"
+  This .jar file allows SOAPUI to know about all SQL functionalities, without this file we cannot execute
+  database testing with SOAPUI.
+- Now in the SOPAUI "JDBC Request" in the configuration panel start defining the database driver that
+  we are going to use, mysql driver in this case.
+     In the Driver field provision: com.mysql.jdbc.Driver
+     In the connection string field: jdbc:mysql://[hostname]:[port]/[database]?[property][=value].
+                            this is: jdbc:mysql://localhost:3306/testdb?user=root&password=password
+      without &password, because not defined: jdbc:mysql://localhost:3306/testdb?user=root
+- In the SQL Query panel, enter the sql query:
+	select * from  ${#TestSuite#tableName} //table from a TestSuite level property. 
+	select * from  ${#TestSuite#tableName} where course = '${ALL Courses JDBC Request#ResponseAsXml#//ResultSet/Row[3]/TRAINING.COURSE}'
+	above where clause uses the value of a course included in the XML response of a previous JDBC Request.        
+_ below assertions can be defined:
+	. JDBC Status
+	. JDBC Timeout
+	. Contains ResultSet Tag = "ResultSet"
+	. Content of column Training.Name in Second Row is: Venktesh - Xpath
+	  with Xpath Match expression: xpaht //ResultSet/Row[1]/TRAINING.NAME and vaue "Trainer" 
+	. Content of column Training.Location in Row[3] is: India - Xpath
+	  with Xpath Match expression: //ResultSet/Row[1]/TRAINING.LOCATION and value "India"
+	. Count of Rows in Response is = 4 
+	  with value Xpath Match expression: count(//ResultSet/Row) and value '1'
+	. ResultSet Tag Exists = true  
+	  with value Xpath Match expression: exists(//ResultSet) and value "true"
+- A testStep was created for Property Transfer: "skill-Location Properties Transfer" to transfer two
+  of the columns in the response XML to testCases level properties skill and location.
+    . with source: "ALL courses JDBC Request", property: ResponseAsXml, Path language: Xpath
+      and xpath: //ResultSet/Row[2]/TRAINING.SKILL
+      //ResultSet/Row[2]/TRAINING.LOCATION	  
+    
+    . with Target: "JDBCTestCase", property: skill/location, Path language: Xpath
+  

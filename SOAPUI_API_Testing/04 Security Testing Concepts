@@ -1,0 +1,40 @@
+SECURITY TESTING CONCEPTS:
+1- SQL injection.
+2- Xpath injection.
+3- Fuzzing scan
+4- Invalid Types
+5- Boundary Scan
+6- Malformed XML
+7- XML bomb.
+8- Cross Site scripting.
+9- Malicious Attachment.
+
+this URL contains an introduction to security testing: https://www.soapui.org/security-testing/getting-started.html
+
+SQL injection: testing is created to validate that the queries used by the application does not allow the use
+               of general expression as the value of a userID, Like: 
+               select * from login_table where password='password' and userId = 'pds%'. the % is for general
+               expression. hackers normally use % general expressions method. they hack the query sent to the 
+               server and inject the % general expression. This a leakage because the backend developer must 
+               writes the query that DOES NOT allow % regular expression use.
+               As tester we have to make sure that the application does not allow these SQL injection leakage.
+               for more detail on SQL injection: https://www.soapui.org/security-testing/security-scans/sql-injection.html
+                                                 https://en.wikipedia.org/wiki/SQL_injection
+                                                 
+ Xpath Injection: See url https://www.soapui.org/security-testing/security-scans/xpath-injection.html
+ 
+ Fuzzing scan: see url https://www.soapui.org/security-testing/security-scans/fuzzing-scan.html     
+ 
+ Invalid types: see url https://www.soapui.org/security-testing/security-scans/invalid-types.html
+ 
+ Boundary scan: see url: https://www.soapui.org/security-testing/security-scans/boundary-scan.html
+ 
+ Malformed XML: see url: https://www.soapui.org/security-testing/security-scans/malformed-xml.html
+ 
+ XML Bomb: see url https://www.soapui.org/security-testing/security-scans/xml-bomb.html
+ 
+ Cross Site Scan: see url https://www.soapui.org/security-testing/security-scans/cross-site-scripting.html
+ 
+ Malicious Attachment: see url: https://www.soapui.org/security-testing/security-scans/malicious-attachment.html
+ 
+ Custom scan: see url: https://www.soapui.org/security-testing/security-scans/custom-scan.html

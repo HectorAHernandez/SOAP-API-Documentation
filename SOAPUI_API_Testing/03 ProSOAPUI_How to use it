@@ -1,0 +1,101 @@
+								How to use SOAPUI Pro.
+USING DATASOURCE and DATASOURCE LOOP (Like dataProvider) to automatically provision the input data (or the
+values for the input nodes) for an Add request API:
+1- Create a project indicating the corresponding WSDL or endPoint.
+2- Create a TestSuite
+3- Create a testCase.
+4- Right click on the testCase and select "Add Step" and click on "DataSource"
+5- Add all the Properties/fields that the DataSource will contain according to the nodes/object attributes in
+   the Request XML or JSON format for the POST method. We can add and additional property "Verification" that
+   can be used to compare the response value "true" from the "Add Request API". With this value we can provision
+   the value true or false, depending on if we want to expect success or failure.
+6- Select the DataSource from: Excel, File, Grid, Groovy, JDBC, XML, Data Connection, Directory:
+	For example if Grid is selected: a panel will be opened to manually provision data for all the properties
+	added in step # 6.
+	If Excel is selected, then a popup will ask for the location of the Excel file (only .xls is valid, this
+	is Excel 97 through Excel 2003 Workbook) and then automatically all data will be automatically loaded 
+	into each property added in step #5.
+7- Click on the "Run" button to compile the data provisioned/loaded to make them available to the Request API 
+   that is going to be executed. A popup will ask the number of rows to compile, so that we can say 10 or 1000,
+   or the amount we want.        								
+
+8- Right click on the testCase and select "Add Step" and click on "SOAP Request" or "REST Request" and select
+   the API Request (Add Employee, in this case) from the original WSDL when created the project.
+9- Click on the added step Request, and open the "Form" tab.
+10- For each property in the "Form":
+	- right click and select "Get Data..." 
+	- Select "Step 1: [DataSource]"
+	- Click on the property corresponding to the property in the "Form"   
+11- Run/send the AddEmployee Request.
+12- Verify the RESPONSE  contains the return true.
+13- By validating the database table employee, it will be uncover that only one row was added out of the n rows
+    we provisioned. In order to process all the rows we have to create a loop for re-execute the DataSource and
+    AddEmployee steps, so we have to add a "DataSource Loop" testStep: 	
+14- Right click on the testCase and select "Add Step" and click on "DataSource Loop"
+15- Click on the added "DataSource Loop" step to configure it.
+16- In the configuration popup, In the "DataSource Step" select the step for DataSource corresponding to the 
+    "AddEmployee" request.
+    In the "Target step" select the "AddEmployee" step or the step to execute.
+    The loop will execute as many times as rows exist in the DataSource.
+17- Make sures that all the steps are following below order in the testCase:
+		- DataSource Step
+		- AddEmploye Step
+		- DataSource Loop Step.
+18- Click on the TestCase and run/execute it and verify that the three steps were executed n times according the
+    number of rows in the input DataSource.
+    
+    									USING SINK data
+First create a new project DataSink:
+DataSink is used to update an external file/source with the content in the output RESPONSE request and the values
+we used as input to execute the REQUEST (In the "Form" tab) . This is like
+sending the data in the RESPONSE xml AND in the "Form" tab into an output document or Excel spreadsheet.
+1- Create a project indicating the corresponding WSDL or endPoint.
+2- Create a TestSuite
+3- Create a testCase.
+4- Right click on the testCase and select "Add Step" and click on "Data Sink"
+5- Add all the Properties/fields that the DataSink will contain according to the nodes/object attributes in
+   the Request XML or JSON format for the POST method. And at the same time provision the values we want
+   to use for each property (or that we will pass later to the input request "Form". We HAVE ADD ANY additional 
+   property (named: ResultOfAdd, TotalPrice) that we want to pass, as Verification, to the output Sink source (no need to provision any value
+   now, because the value will be transfer later from the out RESPONSE XML or JSON), Example the return code in the 
+   RESPONSE XML To have it beside all of the other input values we used for execution. With this value we can provision
+   the value true or false, depending on if we want to expect success or failure. ALSO we can add the value for
+   ANY Property/node in the RESPONSE that we want to pass to the output spreadSheet or other type of document.
+6- To configure the OUTPUT document receiving the result, Select the DataSink from: Excel, File, Grid, Groovy, JDBC,...:
+	For example If Excel is selected, then a popup will ask for the location of the Excel file (only .xls is valid, this
+	is Excel 97 through Excel 2003 Workbook) and then indicate the Output file to be used by browsing the location
+	in the local file system
+	Now when the DataSink is run/executed all the data will be passed to the output spreadsheet.
+
+7- Right click on the testCase and select "Add Step" and click on "SOAP Request" or "REST Request" and select
+   the API Request (Add Employee, in this case) from the original WSDL when created the project.
+8- Click on the added step Request, and open the "Form" tab.
+9- For each property in the "Form":
+	- right click and select "Get Data..." 
+	- Select "Step 1: [DataSink]"
+	- Click on the property corresponding to the property in the "Form"   
+10- To move or transfer the data from the output RESPONSE XML or JSON, TO the new output properties defined in 
+   the DataSink, we have to ADD a "Property Transfer" step as follow: 
+11- Right click on the testCase and select "Add Step" and click on "Property Transfer" 
+12- Add a transfer for EACH one of the new properties added to the DataSink:
+	12.1 Click on Add property button give a name, example Result_1.
+	12.2 In the Source panel: Select the Source, this should be "AddEmployee" or the API Request we are executing.
+	12.3 In the Source panel: select the Property: most be Response (we want to the value of a property in the RESPONSE XML or JSON)
+	12.4 Because we are in SOAPUI PRO, to define the xpath for the property click on the right side button to 
+	     select the source xpath. If we receive the popup for "Missing Property value" then click Yes to accept 
+	     or use a "Default Property value instead"
+	12.5 click on the node/property from where we want to get the value from and click Ok button.
+	12.6 verify that the corresponding xpath or jsonPath is generated in the below panel.   
+	
+	12.7 In the Target panel: Select the Target of DataSink.
+	12.8 In the Target panel: select the Property name of one of the new property (named: ResultOfAdd, TotalPrice) added in step 5 
+
+13- Make sure that all the steps are following below order in the testCase:
+		- AddEmploye Step
+		- Property Transfer Step.
+		- DataSink Step
+14- Click on the TestCase and run/execute it and verify that the added property is inserted in the output file
+    or spreadsheet.
+        											
+		            
+   

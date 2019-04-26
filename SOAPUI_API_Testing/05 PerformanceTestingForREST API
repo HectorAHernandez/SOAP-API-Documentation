@@ -1,0 +1,118 @@
+Tips for Performance Testing using REST API.
+
+Using the google Search webservice definition at: https://developers.google.com/places/web-service/search
+for the "Nearby Search Requests" API.
+https://maps.googleapis.com/maps/api/place/nearbysearch/output?parameters
+where output may be either of the following values:
+	json (recommended) indicates output in JavaScript Object Notation (JSON)
+	xml indicates output as XML
+
+Required parameters
+key — Your application's API key. This key identifies your application. See Get a key for more information.
+location — The latitude/longitude around which to retrieve place information. This must be specified 
+           as latitude,longitude.
+radius — Defines the distance (in meters) within which to return place results. The maximum allowed 
+         radius is 50 000 meters. Note that radius must not be included if rankby=distance 
+         (described under Optional parameters below) is specified.
+If rankby=distance (described under Optional parameters below) is specified, then one or more of 
+        keyword, name, or type is required.
+
+Optional parameters
+keyword — A term to be matched against all content that Google has indexed for this place, including 
+          but not limited to name, type, and address, as well as customer reviews and other 
+          third-party content.
+language — The language code, indicating in which language the results should be returned, if possible. 
+           See the list of supported languages and their codes. Note that we often update supported 
+           languages so this list may not be exhaustive.
+minprice and maxprice (optional) — Restricts results to only those places within the specified range. 
+          Valid values range between 0 (most affordable) to 4 (most expensive), inclusive. The exact 
+          amount indicated by a specific value will vary from region to region.
+name — A term to be matched against all content that Google has indexed for this place. Equivalent to 
+          keyword. The name field is no longer restricted to place names. Values in this field are 
+          combined with values in the keyword field and passed as part of the same search string. We 
+          recommend using only the keyword parameter for all search terms.
+opennow — Returns only those places that are open for business at the time the query is sent. Places
+          that do not specify opening hours in the 	
+....
+
+We have to download JMeter in to do peformace test from: http://jmeter.apache.org/download_jmeter.cgi
+- select the binary zip version, for windows.
+- Download it in a JMeter directory, so from here it will be triggered.
+- move to directory: cd C:\JMeter\apache-jmeter-4.0\bin                       
+-Launch JMeter: You can start JMeter in 3 modes
+	. GUI Mode
+	. Server Mode
+	. Command Line Mode
+Start JMeter in GUI Mode
+If you are using Window, just run the file /bin/jmeter.bat to start JMeter in GUI mode as shown below
+        (I prefer the GUI mode, for now)
+Start JMeter in Server Mode: Server mode is used for distributed testing. This Testing works as 
+                client-server model. In this model, JMeter runs on server computer in server mode.
+                 On client computer, JMeter runs in GUI mode.
+            To start the server mode, you run the bat file bin\jmeter-server.bat as below figure         
+Start JMeter in command line mode: JMeter in GUI mode consumes much computer memory. For saving 
+              resource, you may choose to run JMeter without the GUI. To do so, use the following 
+              command options,  this is a command line example
+      $jmeter -n -t testPlan.jmx - l log.jtl -H 127.0.0.1 -P 8000         
+
+IN JMeter UI.
+1- Right click on the "Test Plan", click on the "Add", Select "Thread Group"
+2- provision 25 for the number of threads or user    
+3- Right click on the just created "Threads Group" then "Add" --> Sampler -- HTTP Request.
+4- provision the name: "Google Place Search REST API Load Test"
+we will be using: https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=1500&type=restaurant&keyword=cruise&key=
+5- provision Protocol: https OR http, depending on the API definition.
+6- provision "Server name or IP: maps.googleapis.com     //(without https://)
+7- select Method: GET, if the POST, then use "Body Data" tab instead of Paramenters tab.
+8- Provision Path: maps/api/place/nearbysearch/json OR we can provision the Path including the parameters:
+                   maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=1500&type=restaurant&keyword=cruise&key=xxxx
+9- Provision all needed parameters, starting after the ? character, by clicking on the "Parameters" tab
+              and then clicking the Add button:   
+   location=-33.8670522,151.1957362&radius=1500&type=restaurant&keyword=cruise&key=AIzaSyAPZEOnGpNTrh-Oqh-kBxLzKL3y_jXiwyw
+   key is my google place API key.       
+10- To view the result: Right click on the just created "Threads Group" then "Add" -->
+    											 listener --> "View Results Tree" 
+11- to RUN the test, click on the just created "View Results Tree" and click the Green run button.
+12- The "Text" panel shows a line for each one of the 25 Threads executed.
+13- the "Sampler Result" tab, for each thread contains below variables and values, that we can use for 
+    analysis of the performance:
+Thread Name: Thread Group 1-24
+Sample Start: 2018-07-05 17:52:30 EDT
+Load time: 789
+Connect Time: 687
+Latency: 788
+Size in bytes: 514
+Sent bytes:263
+Headers size in bytes: 419
+Body size in bytes: 95
+Sample Count: 1
+Error Count: 0
+Data type ("text"|"bin"|""): text
+Response code: 200
+Response message: OK
+
+Response headers:
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Date: Thu, 05 Jul 2018 21:52:29 GMT
+Expires: Thu, 05 Jul 2018 21:57:29 GMT
+Cache-Control: public, max-age=300
+Server: scaffolding on HTTPServer2
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Alt-Svc: quic=":443"; ma=2592000; v="43,42,41,39,35"
+Accept-Ranges: none
+Vary: Accept-Language,Accept-Encoding
+Transfer-Encoding: chunked
+
+HTTPSampleResult fields:
+ContentType: application/json; charset=UTF-8
+DataEncoding: UTF-8
+       											           
+In the "Response Data" tab make sure that the xml/JSON RESPONSE is there without any error. 
+14- To Generate "Aggregated Report" result: Right click on the just created "Threads Group" then "Add" -->
+    											 listener --> "Aggregate Report"   
+15- to RUN the test, click on the just created "Aggregate Report" and click the Green run button.
+16- Repeat step 14 and 15 for all the different Listener/report type we need.  
+
+This is used to get the current time when defining a property ${=(int)new java.util.Date().time/1000}  											     											           
